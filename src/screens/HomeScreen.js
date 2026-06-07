@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   View, Text, TouchableOpacity, ActivityIndicator,
-  Platform, ScrollView, TextInput, useWindowDimensions,
+  Platform, ScrollView, TextInput, useWindowDimensions, Modal,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getExpenses, deleteExpenseAPI } from "../services/api";
@@ -17,32 +17,40 @@ export default function HomeScreen({ navigation, onLogout }) {
   const [activePeriod, setActivePeriod] = useState("Tout");
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Header simplifié — juste déconnexion sur mobile
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <View style={{ flexDirection: "row", gap: isMobile ? 8 : 15, marginRight: 10 }}>
-          {!isMobile && (
-            <>
-              <TouchableOpacity onPress={() => navigation.navigate("AjouterDepense")}>
-                <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>+ Nouvelle</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate("Graphiques")}>
-                <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Graphiques</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate("Statistiques")}>
-                <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Stats</Text>
-              </TouchableOpacity>
-            </>
-          )}
+      // Hamburger à gauche sur mobile
+      headerLeft: isMobile ? () => (
+        <TouchableOpacity
+          onPress={() => setDrawerOpen(true)}
+          style={{ marginLeft: 14, padding: 4 }}
+        >
+          <View style={{ gap: 5 }}>
+            <View style={{ width: 22, height: 2, backgroundColor: "#fff", borderRadius: 2 }} />
+            <View style={{ width: 22, height: 2, backgroundColor: "#fff", borderRadius: 2 }} />
+            <View style={{ width: 22, height: 2, backgroundColor: "#fff", borderRadius: 2 }} />
+          </View>
+        </TouchableOpacity>
+      ) : undefined,
+      // Boutons classiques sur desktop
+      headerRight: !isMobile ? () => (
+        <View style={{ flexDirection: "row", gap: 15, marginRight: 10 }}>
+          <TouchableOpacity onPress={() => navigation.navigate("AjouterDepense")}>
+            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>+ Nouvelle</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Graphiques")}>
+            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Graphiques</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Statistiques")}>
+            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Stats</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={onLogout}>
-            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>
-              {isMobile ? "⏻" : "Déconnexion"}
-            </Text>
+            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Déconnexion</Text>
           </TouchableOpacity>
         </View>
-      ),
+      ) : undefined,
     });
   }, [navigation, onLogout, isMobile]);
 
@@ -375,41 +383,79 @@ export default function HomeScreen({ navigation, onLogout }) {
         </View>
       </ScrollView>
 
-      {/* BOTTOM NAV — mobile uniquement */}
-      {isMobile && (
-        <View style={{
-          flexDirection: "row",
-          backgroundColor: "#fff",
-          borderTopWidth: 1,
-          borderTopColor: "#eee",
-          paddingBottom: 20,
-          paddingTop: 10,
-          elevation: 10,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
-        }}>
-          {[
-            { label: "Accueil", icon: "🏠", onPress: null },
-            { label: "Ajouter", icon: "➕", onPress: () => navigation.navigate("AjouterDepense") },
-            { label: "Graphiques", icon: "📊", onPress: () => navigation.navigate("Graphiques") },
-            { label: "Stats", icon: "📈", onPress: () => navigation.navigate("Statistiques") },
-            { label: "Quitter", icon: "🚪", onPress: onLogout },
-          ].map((item) => (
-            <TouchableOpacity
-              key={item.label}
-              onPress={item.onPress}
-              style={{ flex: 1, alignItems: "center" }}
-            >
-              <Text style={{ fontSize: 22 }}>{item.icon}</Text>
-              <Text style={{ fontSize: 10, color: item.onPress === null ? "#2ecc71" : "#888", marginTop: 2, fontWeight: item.onPress === null ? "700" : "400" }}>
-                {item.label}
+      {/* DRAWER MENU — mobile */}
+      <Modal
+        visible={drawerOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDrawerOpen(false)}
+      >
+        {/* Fond sombre */}
+        <TouchableOpacity
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)" }}
+          activeOpacity={1}
+          onPress={() => setDrawerOpen(false)}
+        >
+          {/* Panneau gauche */}
+          <TouchableOpacity activeOpacity={1} onPress={() => {}}>
+            <View style={{
+              width: 270,
+              height: "100%",
+              backgroundColor: "#fff",
+              paddingTop: 60,
+              paddingHorizontal: 24,
+              elevation: 20,
+              shadowColor: "#000",
+              shadowOffset: { width: 4, height: 0 },
+              shadowOpacity: 0.15,
+              shadowRadius: 12,
+            }}>
+              {/* Nom utilisateur */}
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1a1a1a", marginBottom: 4 }}>
+                {user?.nom || "Utilisateur"}
               </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+              <Text style={{ fontSize: 13, color: "#999", marginBottom: 32 }}>
+                {user?.email || ""}
+              </Text>
+
+              <View style={{ height: 1, backgroundColor: "#f0f0f0", marginBottom: 24 }} />
+
+              {[
+                { icon: "➕", label: "Nouvelle dépense", onPress: () => navigation.navigate("AjouterDepense") },
+                { icon: "📊", label: "Graphiques",       onPress: () => navigation.navigate("Graphiques") },
+                { icon: "📈", label: "Statistiques",     onPress: () => navigation.navigate("Statistiques") },
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.label}
+                  onPress={() => { setDrawerOpen(false); item.onPress(); }}
+                  style={{
+                    flexDirection: "row", alignItems: "center", gap: 16,
+                    paddingVertical: 16,
+                    borderBottomWidth: 1, borderBottomColor: "#f5f5f5",
+                  }}
+                >
+                  <Text style={{ fontSize: 22 }}>{item.icon}</Text>
+                  <Text style={{ fontSize: 16, color: "#333", fontWeight: "500" }}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+
+              {/* Déconnexion */}
+              <TouchableOpacity
+                onPress={() => { setDrawerOpen(false); onLogout(); }}
+                style={{
+                  flexDirection: "row", alignItems: "center", gap: 16,
+                  marginTop: 32, paddingVertical: 14,
+                  backgroundColor: "#fff0f0", borderRadius: 14,
+                  paddingHorizontal: 16,
+                }}
+              >
+                <Text style={{ fontSize: 22 }}>🚪</Text>
+                <Text style={{ fontSize: 16, color: "#e74c3c", fontWeight: "600" }}>Déconnexion</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
