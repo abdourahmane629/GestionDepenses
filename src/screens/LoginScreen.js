@@ -80,7 +80,6 @@ export default function LoginScreen({ navigation, onLogin }) {
   return (
     <View style={{ flex: 1, backgroundColor: "#f5f5f5", justifyContent: "center", padding: 20 }}>
       <View style={{ alignItems: "center", marginBottom: 40 }}>
-        <Text style={{ fontSize: 50 }}>💰</Text>
         <Text style={{ fontSize: 28, fontWeight: "bold", color: "#2ecc71" }}>
           Gestion Dépenses
         </Text>
