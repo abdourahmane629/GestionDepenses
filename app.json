@@ -3,6 +3,7 @@
     "name": "GestionDepenses",
     "slug": "GestionDepenses",
     "version": "1.0.0",
+    "scheme": "gestiondepenses",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,6 +20,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-web-browser"
+    ]
   }
 }
