@@ -75,11 +75,12 @@ export default function AddExpenseScreen({ navigation }) {
             key={cat.label}
             onPress={() => setCategory(cat.label)}
             style={{
-              backgroundColor: category === cat.label ? cat.color : "#e0e0e0",
+              backgroundColor: category === cat.label ? "#2ecc71" : "#fff",
               borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8,
+              borderWidth: 1, borderColor: category === cat.label ? "#2ecc71" : "#ddd",
             }}
           >
-            <Text style={{ fontWeight: "600" }}>
+            <Text style={{ fontWeight: "600", color: category === cat.label ? "#fff" : "#333" }}>
               {cat.label}
             </Text>
           </TouchableOpacity>
