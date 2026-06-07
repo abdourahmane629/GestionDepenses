@@ -421,9 +421,9 @@ export default function HomeScreen({ navigation, onLogout }) {
               <View style={{ height: 1, backgroundColor: "#f0f0f0", marginBottom: 24 }} />
 
               {[
-                { icon: "➕", label: "Nouvelle dépense", onPress: () => navigation.navigate("AjouterDepense") },
-                { icon: "📊", label: "Graphiques",       onPress: () => navigation.navigate("Graphiques") },
-                { icon: "📈", label: "Statistiques",     onPress: () => navigation.navigate("Statistiques") },
+                { label: "Nouvelle dépense", onPress: () => navigation.navigate("AjouterDepense") },
+                { label: "Graphiques",       onPress: () => navigation.navigate("Graphiques") },
+                { label: "Statistiques",     onPress: () => navigation.navigate("Statistiques") },
               ].map((item) => (
                 <TouchableOpacity
                   key={item.label}
@@ -434,7 +434,6 @@ export default function HomeScreen({ navigation, onLogout }) {
                     borderBottomWidth: 1, borderBottomColor: "#f5f5f5",
                   }}
                 >
-                  <Text style={{ fontSize: 22 }}>{item.icon}</Text>
                   <Text style={{ fontSize: 16, color: "#333", fontWeight: "500" }}>{item.label}</Text>
                 </TouchableOpacity>
               ))}
@@ -449,7 +448,6 @@ export default function HomeScreen({ navigation, onLogout }) {
                   paddingHorizontal: 16,
                 }}
               >
-                <Text style={{ fontSize: 22 }}>🚪</Text>
                 <Text style={{ fontSize: 16, color: "#e74c3c", fontWeight: "600" }}>Déconnexion</Text>
               </TouchableOpacity>
             </View>
