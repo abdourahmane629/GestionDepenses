@@ -57,7 +57,7 @@ export default function StatisticsScreen() {
     const subtotal = calculateTotal(items);
     const percent = total > 0 ? parseFloat(((subtotal / total) * 100).toFixed(1)) : 0;
     return { ...cat, subtotal, count: items.length, percent };
-  }).filter((c) => c.count > 0);
+  }).filter((c) => c.count > 0).sort((a, b) => b.percent - a.percent);
 
   if (loading) {
     return (
