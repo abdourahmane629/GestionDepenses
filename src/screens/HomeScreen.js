@@ -130,7 +130,7 @@ export default function HomeScreen({ navigation, onLogout }) {
   const periodFiltered = filterByPeriod(expenses);
 
   // Seulement les catégories présentes dans la période sélectionnée
-  const availableCategories = allCategories.filter((cat) =>
+  const availableCategories = [...new Map(allCategories.map((cat) => [cat.label, cat])).values()].filter((cat) =>
     periodFiltered.some((e) => e.category === cat.label)
   );
 
@@ -146,7 +146,7 @@ export default function HomeScreen({ navigation, onLogout }) {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }));
   const avgExpense = filtered.length > 0 ? total / filtered.length : 0;
-  const topCategory = [...allCategories].map((cat) => ({
+  const topCategory = [...new Map(allCategories.map((cat) => [cat.label, cat])).values()].map((cat) => ({
     ...cat, total: calculateTotal(periodFiltered.filter((e) => e.category === cat.label)),
   })).sort((a, b) => b.total - a.total)[0];
 

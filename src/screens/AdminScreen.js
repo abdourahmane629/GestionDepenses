@@ -106,7 +106,7 @@ export default function AdminScreen({ navigation, onLogout }) {
           <Text style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10, color: "#333" }}>
             Dépenses par catégorie
           </Text>
-          {[...allCategories]
+          {[...new Map(allCategories.map((cat) => [cat.label, cat])).values()]
             .map((cat) => {
               const catExpenses = expenses.filter((e) => e.category === cat.label);
               const catTotal = catExpenses.reduce((sum, e) => sum + Number(e.amount), 0);

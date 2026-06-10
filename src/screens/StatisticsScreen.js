@@ -58,7 +58,7 @@ export default function StatisticsScreen() {
   const filtered = filterByPeriod(expenses);
   const total = calculateTotal(filtered);
 
-  const statsByCategory = allCategories.map((cat) => {
+  const statsByCategory = [...new Map(allCategories.map((cat) => [cat.label, cat])).values()].map((cat) => {
     const items = filtered.filter((e) => e.category === cat.label);
     const subtotal = calculateTotal(items);
     const percent = total > 0 ? parseFloat(((subtotal / total) * 100).toFixed(1)) : 0;
