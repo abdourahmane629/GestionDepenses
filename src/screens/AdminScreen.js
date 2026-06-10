@@ -5,12 +5,14 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAllUsers, getExpenses } from "../services/api";
-import { formatAmount, CATEGORIES } from "../utils/helpers";
+import { formatAmount } from "../utils/helpers";
+import { loadCategories } from "../utils/categoryUtils";
 
 export default function AdminScreen({ navigation, onLogout }) {
   const [users, setUsers] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [allCategories, setAllCategories] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -37,6 +39,9 @@ export default function AdminScreen({ navigation, onLogout }) {
           <TouchableOpacity onPress={() => navigation.navigate("AdminGraphiques")}>
             <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Graphiques</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("AdminCategories")}>
+            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Catégories</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={onLogout}>
             <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Déconnexion</Text>
           </TouchableOpacity>
@@ -49,12 +54,14 @@ export default function AdminScreen({ navigation, onLogout }) {
     const load = async () => {
       setLoading(true);
       const token = await AsyncStorage.getItem("token");
-      const [usersData, expensesData] = await Promise.all([
+      const [usersData, expensesData, cats] = await Promise.all([
         getAllUsers(token),
         getExpenses(token),
+        loadCategories(),
       ]);
       setUsers(Array.isArray(usersData) ? usersData : []);
       setExpenses(Array.isArray(expensesData) ? expensesData : []);
+      setAllCategories(cats);
       setLoading(false);
     };
     load();
@@ -99,7 +106,7 @@ export default function AdminScreen({ navigation, onLogout }) {
           <Text style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10, color: "#333" }}>
             Dépenses par catégorie
           </Text>
-          {[...CATEGORIES]
+          {[...allCategories]
             .map((cat) => {
               const catExpenses = expenses.filter((e) => e.category === cat.label);
               const catTotal = catExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
@@ -168,6 +175,7 @@ export default function AdminScreen({ navigation, onLogout }) {
               {[
                 { label: "Utilisateurs", onPress: () => navigation.navigate("AdminUtilisateurs") },
                 { label: "Graphiques",   onPress: () => navigation.navigate("AdminGraphiques") },
+                { label: "Catégories",   onPress: () => navigation.navigate("AdminCategories") },
               ].map((item) => (
                 <TouchableOpacity
                   key={item.label}

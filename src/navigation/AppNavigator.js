@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { TouchableOpacity, Text, ActivityIndicator, View, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, ActivityIndicator, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,6 +15,9 @@ import EditExpenseScreen from "../screens/EditExpenseScreen";
 import ChartsScreen from "../screens/ChartsScreen";
 import AdminUsersScreen from "../screens/AdminUsersScreen";
 import SetPasswordScreen from "../screens/SetPasswordScreen";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import AdminCategoriesScreen from "../screens/AdminCategoriesScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -65,10 +68,11 @@ export default function AppNavigator() {
               )}
             </Stack.Screen>
             <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
           </Stack.Navigator>
 
         ) : user.role === "admin" ? (
-          /* ===== ADMIN STACK — uniquement le panel admin ===== */
+          /* ===== ADMIN STACK ===== */
           <Stack.Navigator
             screenOptions={{
               headerStyle: { backgroundColor: "#2ecc71" },
@@ -84,6 +88,7 @@ export default function AppNavigator() {
             </Stack.Screen>
             <Stack.Screen name="AdminGraphiques" component={ChartsScreen} options={{ title: "Graphiques" }} />
             <Stack.Screen name="AdminUtilisateurs" component={AdminUsersScreen} options={{ title: "Utilisateurs" }} />
+            <Stack.Screen name="AdminCategories" component={AdminCategoriesScreen} options={{ title: "Catégories" }} />
           </Stack.Navigator>
 
         ) : (
@@ -105,6 +110,7 @@ export default function AppNavigator() {
             <Stack.Screen name="Statistiques" component={StatisticsScreen} options={{ title: "Statistiques" }} />
             <Stack.Screen name="Graphiques" component={ChartsScreen} options={{ title: "Graphiques" }} />
             <Stack.Screen name="ModifierDepense" component={EditExpenseScreen} options={{ title: "Modifier la dépense" }} />
+            <Stack.Screen name="Profil" component={ProfileScreen} options={{ title: "Mon Profil" }} />
           </Stack.Navigator>
         )}
       </NavigationContainer>

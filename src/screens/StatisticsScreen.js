@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getExpenses } from "../services/api";
-import { calculateTotal, formatAmount, CATEGORIES } from "../utils/helpers";
+import { calculateTotal, formatAmount } from "../utils/helpers";
+import { loadCategories } from "../utils/categoryUtils";
 
 const periods = ["Tout", "Aujourd'hui", "Cette semaine", "Ce mois", "Cette année"];
 
@@ -10,12 +11,17 @@ export default function StatisticsScreen() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activePeriod, setActivePeriod] = useState("Tout");
+  const [allCategories, setAllCategories] = useState([]);
 
   useEffect(() => {
     const load = async () => {
       const token = await AsyncStorage.getItem("token");
-      const data = await getExpenses(token);
+      const [data, cats] = await Promise.all([
+        getExpenses(token),
+        loadCategories(),
+      ]);
       setExpenses(Array.isArray(data) ? data : []);
+      setAllCategories(cats);
       setLoading(false);
     };
     load();
@@ -52,7 +58,7 @@ export default function StatisticsScreen() {
   const filtered = filterByPeriod(expenses);
   const total = calculateTotal(filtered);
 
-  const statsByCategory = CATEGORIES.map((cat) => {
+  const statsByCategory = allCategories.map((cat) => {
     const items = filtered.filter((e) => e.category === cat.label);
     const subtotal = calculateTotal(items);
     const percent = total > 0 ? parseFloat(((subtotal / total) * 100).toFixed(1)) : 0;

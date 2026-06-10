@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getExpenses, deleteExpenseAPI } from "../services/api";
 import CategoryBadge from "../components/CategoryBadge";
 import { formatAmount, formatDate, calculateTotal, CATEGORIES } from "../utils/helpers";
+import { loadCategories } from "../utils/categoryUtils";
 
 export default function HomeScreen({ navigation, onLogout }) {
   const [expenses, setExpenses] = useState([]);
@@ -15,6 +16,7 @@ export default function HomeScreen({ navigation, onLogout }) {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("Tout");
   const [activePeriod, setActivePeriod] = useState("Tout");
+  const [allCategories, setAllCategories] = useState([]);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -46,6 +48,9 @@ export default function HomeScreen({ navigation, onLogout }) {
           <TouchableOpacity onPress={() => navigation.navigate("Statistiques")}>
             <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Stats</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Profil")}>
+            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Profil</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={onLogout}>
             <Text style={{ color: "#fff", fontWeight: "600", fontSize: 14 }}>Déconnexion</Text>
           </TouchableOpacity>
@@ -59,7 +64,16 @@ export default function HomeScreen({ navigation, onLogout }) {
       const storedUser = await AsyncStorage.getItem("user");
       if (storedUser) setUser(JSON.parse(storedUser));
       const token = await AsyncStorage.getItem("token");
+      loadCategories().then(setAllCategories);
       const data = await getExpenses(token);
+      // Compte bloqué par l'admin
+      if (data.message === "Compte bloqué par l'administrateur") {
+        Platform.OS === "web"
+          ? window.alert("Votre compte a été bloqué par l'administrateur.")
+          : null;
+        onLogout();
+        return;
+      }
       setExpenses(Array.isArray(data) ? data : []);
       setLoading(false);
     };
@@ -116,7 +130,7 @@ export default function HomeScreen({ navigation, onLogout }) {
   const periodFiltered = filterByPeriod(expenses);
 
   // Seulement les catégories présentes dans la période sélectionnée
-  const availableCategories = CATEGORIES.filter((cat) =>
+  const availableCategories = allCategories.filter((cat) =>
     periodFiltered.some((e) => e.category === cat.label)
   );
 
@@ -132,7 +146,7 @@ export default function HomeScreen({ navigation, onLogout }) {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }));
   const avgExpense = filtered.length > 0 ? total / filtered.length : 0;
-  const topCategory = [...CATEGORIES].map((cat) => ({
+  const topCategory = [...allCategories].map((cat) => ({
     ...cat, total: calculateTotal(periodFiltered.filter((e) => e.category === cat.label)),
   })).sort((a, b) => b.total - a.total)[0];
 
@@ -327,7 +341,7 @@ export default function HomeScreen({ navigation, onLogout }) {
             </View>
           ) : (
             filtered.map((item) => {
-              const cat = CATEGORIES.find((c) => c.label === item.category);
+              const cat = allCategories.find((c) => c.label === item.category);
               return (
                 <View key={item.id} style={{
                   backgroundColor: "#fff", borderRadius: 20, padding: 16,
@@ -353,7 +367,7 @@ export default function HomeScreen({ navigation, onLogout }) {
                     alignItems: "center", marginTop: 12,
                     paddingTop: 10, borderTopWidth: 1, borderTopColor: "#f5f5f5",
                   }}>
-                    <CategoryBadge category={item.category} />
+                    <CategoryBadge category={item.category} categories={allCategories} />
                     <View style={{ flexDirection: "row", gap: 8 }}>
                       <TouchableOpacity
                         onPress={() => navigation.navigate("ModifierDepense", { expense: item })}
@@ -424,6 +438,7 @@ export default function HomeScreen({ navigation, onLogout }) {
                 { label: "Nouvelle dépense", onPress: () => navigation.navigate("AjouterDepense") },
                 { label: "Graphiques",       onPress: () => navigation.navigate("Graphiques") },
                 { label: "Statistiques",     onPress: () => navigation.navigate("Statistiques") },
+                { label: "Mon Profil",       onPress: () => navigation.navigate("Profil") },
               ].map((item) => (
                 <TouchableOpacity
                   key={item.label}
