@@ -401,70 +401,109 @@ export default function HomeScreen({ navigation, onLogout }) {
       <Modal
         visible={drawerOpen}
         transparent
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setDrawerOpen(false)}
       >
-        {/* Fond sombre */}
         <TouchableOpacity
-          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)" }}
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}
           activeOpacity={1}
           onPress={() => setDrawerOpen(false)}
         >
-          {/* Panneau gauche */}
           <TouchableOpacity activeOpacity={1} onPress={() => {}}>
             <View style={{
-              width: 270,
+              width: 285,
               height: "100%",
               backgroundColor: "#fff",
-              paddingTop: 60,
-              paddingHorizontal: 24,
-              elevation: 20,
+              elevation: 24,
               shadowColor: "#000",
-              shadowOffset: { width: 4, height: 0 },
-              shadowOpacity: 0.15,
-              shadowRadius: 12,
+              shadowOffset: { width: 6, height: 0 },
+              shadowOpacity: 0.2,
+              shadowRadius: 16,
+              overflow: "hidden",
             }}>
-              {/* Nom utilisateur */}
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1a1a1a", marginBottom: 4 }}>
-                {user?.nom || "Utilisateur"}
-              </Text>
-              <Text style={{ fontSize: 13, color: "#999", marginBottom: 32 }}>
-                {user?.email || ""}
-              </Text>
 
-              <View style={{ height: 1, backgroundColor: "#f0f0f0", marginBottom: 24 }} />
+              {/* ── En-tête vert avec avatar ── */}
+              <View style={{
+                backgroundColor: "#2ecc71",
+                paddingTop: 56,
+                paddingBottom: 28,
+                paddingHorizontal: 24,
+              }}>
+                {/* Avatar cercle */}
+                <View style={{
+                  width: 58, height: 58, borderRadius: 29,
+                  backgroundColor: "rgba(255,255,255,0.25)",
+                  alignItems: "center", justifyContent: "center",
+                  marginBottom: 14,
+                  borderWidth: 2, borderColor: "rgba(255,255,255,0.5)",
+                }}>
+                  <Text style={{ fontSize: 24, fontWeight: "bold", color: "#fff" }}>
+                    {(user?.nom || "U")[0].toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={{ fontSize: 17, fontWeight: "bold", color: "#fff", marginBottom: 3 }}>
+                  {user?.nom || "Utilisateur"}
+                </Text>
+                <Text style={{ fontSize: 12, color: "rgba(255,255,255,0.75)" }}>
+                  {user?.email || ""}
+                </Text>
+              </View>
 
-              {[
-                { label: "Nouvelle dépense", onPress: () => navigation.navigate("AjouterDepense") },
-                { label: "Graphiques",       onPress: () => navigation.navigate("Graphiques") },
-                { label: "Statistiques",     onPress: () => navigation.navigate("Statistiques") },
-                { label: "Mon Profil",       onPress: () => navigation.navigate("Profil") },
-              ].map((item) => (
+              {/* ── Items de navigation ── */}
+              <View style={{ flex: 1, paddingTop: 12, paddingHorizontal: 16 }}>
+                {[
+                  { icon: "➕", label: "Nouvelle dépense", onPress: () => navigation.navigate("AjouterDepense") },
+                  { icon: "📊", label: "Graphiques",       onPress: () => navigation.navigate("Graphiques") },
+                  { icon: "📈", label: "Statistiques",     onPress: () => navigation.navigate("Statistiques") },
+                  { icon: "👤", label: "Mon Profil",       onPress: () => navigation.navigate("Profil") },
+                ].map((item) => (
+                  <TouchableOpacity
+                    key={item.label}
+                    onPress={() => { setDrawerOpen(false); item.onPress(); }}
+                    style={{
+                      flexDirection: "row", alignItems: "center", gap: 14,
+                      paddingVertical: 14, paddingHorizontal: 12,
+                      borderRadius: 14, marginBottom: 4,
+                    }}
+                  >
+                    <View style={{
+                      width: 40, height: 40, borderRadius: 12,
+                      backgroundColor: "#f0fdf4",
+                      alignItems: "center", justifyContent: "center",
+                    }}>
+                      <Text style={{ fontSize: 18 }}>{item.icon}</Text>
+                    </View>
+                    <Text style={{ fontSize: 15, color: "#1a1a2e", fontWeight: "600" }}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* ── Bouton Déconnexion en bas ── */}
+              <View style={{ paddingHorizontal: 16, paddingBottom: 36, paddingTop: 8 }}>
+                <View style={{ height: 1, backgroundColor: "#f0f0f0", marginBottom: 16 }} />
                 <TouchableOpacity
-                  key={item.label}
-                  onPress={() => { setDrawerOpen(false); item.onPress(); }}
+                  onPress={() => { setDrawerOpen(false); onLogout(); }}
                   style={{
-                    flexDirection: "row", alignItems: "center", gap: 16,
-                    paddingVertical: 16,
-                    borderBottomWidth: 1, borderBottomColor: "#f5f5f5",
+                    flexDirection: "row", alignItems: "center", gap: 14,
+                    paddingVertical: 14, paddingHorizontal: 16,
+                    backgroundColor: "#fff0f0", borderRadius: 14,
                   }}
                 >
-                  <Text style={{ fontSize: 16, color: "#333", fontWeight: "500" }}>{item.label}</Text>
+                  <View style={{
+                    width: 40, height: 40, borderRadius: 12,
+                    backgroundColor: "#ffe0e0",
+                    alignItems: "center", justifyContent: "center",
+                  }}>
+                    <Text style={{ fontSize: 18 }}>🚪</Text>
+                  </View>
+                  <Text style={{ fontSize: 15, color: "#e74c3c", fontWeight: "700" }}>
+                    Déconnexion
+                  </Text>
                 </TouchableOpacity>
-              ))}
+              </View>
 
-              {/* Déconnexion */}
-              <TouchableOpacity
-                onPress={() => { setDrawerOpen(false); onLogout(); }}
-                style={{
-                  flexDirection: "row", alignItems: "center", gap: 16,
-                  marginTop: 32, paddingVertical: 14,
-                  backgroundColor: "#fff0f0", borderRadius: 14,
-                  paddingHorizontal: 16,
-                }}
-              >
-                <Text style={{ fontSize: 16, color: "#e74c3c", fontWeight: "600" }}>Déconnexion</Text>
-              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         </TouchableOpacity>

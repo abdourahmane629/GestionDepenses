@@ -142,63 +142,105 @@ export default function AdminScreen({ navigation, onLogout }) {
       <Modal
         visible={drawerOpen}
         transparent
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setDrawerOpen(false)}
       >
         <TouchableOpacity
-          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)" }}
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}
           activeOpacity={1}
           onPress={() => setDrawerOpen(false)}
         >
           <TouchableOpacity activeOpacity={1} onPress={() => {}}>
             <View style={{
-              width: 270,
+              width: 285,
               height: "100%",
               backgroundColor: "#fff",
-              paddingTop: 60,
-              paddingHorizontal: 24,
-              elevation: 20,
+              elevation: 24,
               shadowColor: "#000",
-              shadowOffset: { width: 4, height: 0 },
-              shadowOpacity: 0.15,
-              shadowRadius: 12,
+              shadowOffset: { width: 6, height: 0 },
+              shadowOpacity: 0.2,
+              shadowRadius: 16,
+              overflow: "hidden",
             }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1a1a1a", marginBottom: 4 }}>
-                Panel Admin
-              </Text>
-              <Text style={{ fontSize: 13, color: "#999", marginBottom: 32 }}>
-                Gestion de l'application
-              </Text>
 
-              <View style={{ height: 1, backgroundColor: "#f0f0f0", marginBottom: 24 }} />
+              {/* ── En-tête vert avec icône admin ── */}
+              <View style={{
+                backgroundColor: "#1a1a2e",
+                paddingTop: 56,
+                paddingBottom: 28,
+                paddingHorizontal: 24,
+              }}>
+                <View style={{
+                  width: 58, height: 58, borderRadius: 29,
+                  backgroundColor: "rgba(46,204,113,0.25)",
+                  alignItems: "center", justifyContent: "center",
+                  marginBottom: 14,
+                  borderWidth: 2, borderColor: "rgba(46,204,113,0.5)",
+                }}>
+                  <Text style={{ fontSize: 24 }}>🛡️</Text>
+                </View>
+                <Text style={{ fontSize: 17, fontWeight: "bold", color: "#fff", marginBottom: 3 }}>
+                  Panel Admin
+                </Text>
+                <Text style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>
+                  Gestion de l'application
+                </Text>
+              </View>
 
-              {[
-                { label: "Utilisateurs", onPress: () => navigation.navigate("AdminUtilisateurs") },
-                { label: "Graphiques",   onPress: () => navigation.navigate("AdminGraphiques") },
-                { label: "Catégories",   onPress: () => navigation.navigate("AdminCategories") },
-              ].map((item) => (
+              {/* ── Items de navigation ── */}
+              <View style={{ flex: 1, paddingTop: 12, paddingHorizontal: 16 }}>
+                {[
+                  { icon: "👥", label: "Utilisateurs", onPress: () => navigation.navigate("AdminUtilisateurs") },
+                  { icon: "📊", label: "Graphiques",   onPress: () => navigation.navigate("AdminGraphiques") },
+                  { icon: "🏷️", label: "Catégories",   onPress: () => navigation.navigate("AdminCategories") },
+                ].map((item) => (
+                  <TouchableOpacity
+                    key={item.label}
+                    onPress={() => { setDrawerOpen(false); item.onPress(); }}
+                    style={{
+                      flexDirection: "row", alignItems: "center", gap: 14,
+                      paddingVertical: 14, paddingHorizontal: 12,
+                      borderRadius: 14, marginBottom: 4,
+                    }}
+                  >
+                    <View style={{
+                      width: 40, height: 40, borderRadius: 12,
+                      backgroundColor: "#f0fdf4",
+                      alignItems: "center", justifyContent: "center",
+                    }}>
+                      <Text style={{ fontSize: 18 }}>{item.icon}</Text>
+                    </View>
+                    <Text style={{ fontSize: 15, color: "#1a1a2e", fontWeight: "600" }}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* ── Bouton Déconnexion en bas ── */}
+              <View style={{ paddingHorizontal: 16, paddingBottom: 36, paddingTop: 8 }}>
+                <View style={{ height: 1, backgroundColor: "#f0f0f0", marginBottom: 16 }} />
                 <TouchableOpacity
-                  key={item.label}
-                  onPress={() => { setDrawerOpen(false); item.onPress(); }}
+                  onPress={() => { setDrawerOpen(false); onLogout(); }}
                   style={{
-                    paddingVertical: 16,
-                    borderBottomWidth: 1, borderBottomColor: "#f5f5f5",
+                    flexDirection: "row", alignItems: "center", gap: 14,
+                    paddingVertical: 14, paddingHorizontal: 16,
+                    backgroundColor: "#fff0f0", borderRadius: 14,
                   }}
                 >
-                  <Text style={{ fontSize: 16, color: "#333", fontWeight: "500" }}>{item.label}</Text>
+                  <View style={{
+                    width: 40, height: 40, borderRadius: 12,
+                    backgroundColor: "#ffe0e0",
+                    alignItems: "center", justifyContent: "center",
+                  }}>
+                    <Text style={{ fontSize: 18 }}>🚪</Text>
+                  </View>
+                  <Text style={{ fontSize: 15, color: "#e74c3c", fontWeight: "700" }}>
+                    Déconnexion
+                  </Text>
                 </TouchableOpacity>
-              ))}
+              </View>
 
-              <TouchableOpacity
-                onPress={() => { setDrawerOpen(false); onLogout(); }}
-                style={{
-                  marginTop: 32, paddingVertical: 14,
-                  backgroundColor: "#fff0f0", borderRadius: 14,
-                  paddingHorizontal: 16, alignItems: "center",
-                }}
-              >
-                <Text style={{ fontSize: 16, color: "#e74c3c", fontWeight: "600" }}>Déconnexion</Text>
-              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         </TouchableOpacity>
