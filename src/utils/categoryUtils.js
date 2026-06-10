@@ -16,8 +16,14 @@ export const loadCategories = async () => {
     }
     const data = await getCategories(token);
     if (Array.isArray(data) && data.length > 0) {
-      await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-      return data;
+      // Dédupliquer les catégories globales par label (garder la première = is_default)
+      const globalCats = [...new Map(
+        data.filter((c) => !c.user_id).map((c) => [c.label, c])
+      ).values()];
+      const personalCats = data.filter((c) => c.user_id);
+      const dedupedData = [...globalCats, ...personalCats];
+      await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ data: dedupedData, timestamp: Date.now() }));
+      return dedupedData;
     }
   } catch {}
   // Fallback sur les catégories hardcodées
