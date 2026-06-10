@@ -5,6 +5,15 @@ import { CATEGORIES } from "./helpers";
 const CACHE_KEY = "categories_cache";
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Déduplique les catégories globales par label (garde la première occurrence)
+const dedup = (data) => {
+  const globalCats = [...new Map(
+    data.filter((c) => !c.user_id).map((c) => [c.label, c])
+  ).values()];
+  const personalCats = data.filter((c) => c.user_id);
+  return [...globalCats, ...personalCats];
+};
+
 // Charger les catégories (avec cache)
 export const loadCategories = async () => {
   try {
@@ -12,16 +21,11 @@ export const loadCategories = async () => {
     const cached = await AsyncStorage.getItem(CACHE_KEY);
     if (cached) {
       const { data, timestamp } = JSON.parse(cached);
-      if (Date.now() - timestamp < CACHE_TTL) return data;
+      if (Date.now() - timestamp < CACHE_TTL) return dedup(data);
     }
     const data = await getCategories(token);
     if (Array.isArray(data) && data.length > 0) {
-      // Dédupliquer les catégories globales par label (garder la première = is_default)
-      const globalCats = [...new Map(
-        data.filter((c) => !c.user_id).map((c) => [c.label, c])
-      ).values()];
-      const personalCats = data.filter((c) => c.user_id);
-      const dedupedData = [...globalCats, ...personalCats];
+      const dedupedData = dedup(data);
       await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ data: dedupedData, timestamp: Date.now() }));
       return dedupedData;
     }
