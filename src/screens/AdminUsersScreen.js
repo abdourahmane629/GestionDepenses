@@ -20,10 +20,15 @@ export default function AdminUsersScreen() {
 
   useEffect(() => {
     const load = async () => {
-      const token = await AsyncStorage.getItem("token");
-      const data = await getAllUsers(token);
-      setUsers(Array.isArray(data) ? data : []);
-      setLoading(false);
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const data = await getAllUsers(token);
+        setUsers(Array.isArray(data) ? data : []);
+      } catch {
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);

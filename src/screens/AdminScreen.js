@@ -53,16 +53,22 @@ export default function AdminScreen({ navigation, onLogout }) {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const token = await AsyncStorage.getItem("token");
-      const [usersData, expensesData, cats] = await Promise.all([
-        getAllUsers(token),
-        getExpenses(token),
-        loadCategories(),
-      ]);
-      setUsers(Array.isArray(usersData) ? usersData : []);
-      setExpenses(Array.isArray(expensesData) ? expensesData : []);
-      setAllCategories(cats);
-      setLoading(false);
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const [usersData, expensesData, cats] = await Promise.all([
+          getAllUsers(token),
+          getExpenses(token),
+          loadCategories(),
+        ]);
+        setUsers(Array.isArray(usersData) ? usersData : []);
+        setExpenses(Array.isArray(expensesData) ? expensesData : []);
+        setAllCategories(cats);
+      } catch {
+        setUsers([]);
+        setExpenses([]);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);

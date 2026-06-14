@@ -15,10 +15,15 @@ export default function ChartsScreen() {
 
   useEffect(() => {
     const load = async () => {
-      const token = await AsyncStorage.getItem("token");
-      const data = await getExpenses(token);
-      setExpenses(Array.isArray(data) ? data : []);
-      setLoading(false);
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const data = await getExpenses(token);
+        setExpenses(Array.isArray(data) ? data : []);
+      } catch {
+        setExpenses([]);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);

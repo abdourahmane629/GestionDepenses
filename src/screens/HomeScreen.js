@@ -61,21 +61,23 @@ export default function HomeScreen({ navigation, onLogout }) {
 
   useEffect(() => {
     const load = async () => {
-      const storedUser = await AsyncStorage.getItem("user");
-      if (storedUser) setUser(JSON.parse(storedUser));
-      const token = await AsyncStorage.getItem("token");
-      loadCategories().then(setAllCategories);
-      const data = await getExpenses(token);
-      // Compte bloqué par l'admin
-      if (data.message === "Compte bloqué par l'administrateur") {
-        Platform.OS === "web"
-          ? window.alert("Votre compte a été bloqué par l'administrateur.")
-          : null;
-        onLogout();
-        return;
+      try {
+        const storedUser = await AsyncStorage.getItem("user");
+        if (storedUser) setUser(JSON.parse(storedUser));
+        const token = await AsyncStorage.getItem("token");
+        loadCategories().then(setAllCategories).catch(() => {});
+        const data = await getExpenses(token);
+        // Compte bloqué par l'admin
+        if (data?.message === "Compte bloqué par l'administrateur") {
+          onLogout();
+          return;
+        }
+        setExpenses(Array.isArray(data) ? data : []);
+      } catch {
+        setExpenses([]);
+      } finally {
+        setLoading(false);
       }
-      setExpenses(Array.isArray(data) ? data : []);
-      setLoading(false);
     };
     const unsubscribe = navigation.addListener("focus", load);
     return unsubscribe;

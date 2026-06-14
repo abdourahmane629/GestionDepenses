@@ -15,14 +15,19 @@ export default function StatisticsScreen() {
 
   useEffect(() => {
     const load = async () => {
-      const token = await AsyncStorage.getItem("token");
-      const [data, cats] = await Promise.all([
-        getExpenses(token),
-        loadCategories(),
-      ]);
-      setExpenses(Array.isArray(data) ? data : []);
-      setAllCategories(cats);
-      setLoading(false);
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const [data, cats] = await Promise.all([
+          getExpenses(token),
+          loadCategories(),
+        ]);
+        setExpenses(Array.isArray(data) ? data : []);
+        setAllCategories(cats);
+      } catch {
+        setExpenses([]);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);
