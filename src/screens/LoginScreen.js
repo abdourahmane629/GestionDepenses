@@ -18,11 +18,11 @@ export default function LoginScreen({ navigation, onLogin }) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    webClientId: GOOGLE_WEB_CLIENT_ID,
-    responseType: "id_token",
-    usePKCE: false,
-  });
+  const [request, response, promptAsync] = Google.useAuthRequest(
+    Platform.OS === "web"
+      ? { webClientId: GOOGLE_WEB_CLIENT_ID, responseType: "id_token", usePKCE: false }
+      : null
+  );
 
   useEffect(() => {
     if (response?.type === "success") {
